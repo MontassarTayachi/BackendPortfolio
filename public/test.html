@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .card {
+            margin-bottom: 15px;
+        }
+        .card-img-top {
+            height: 150px;
+            object-fit: contain;
+            background-color: #f8f9fa;
+            padding: 10px;
+        }
+        .skill-img {
+            height: 80px;
+            width: 80px;
+            object-fit: contain;
+        }
+        .skill-card {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        #response {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Test API Portfolio</h1>
+        
+        <div class="alert alert-info" role="alert">
+            Cette page permet de tester toutes les fonctionnalités de l'API du portfolio.
+        </div>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects" type="button" role="tab" aria-controls="projects" aria-selected="true">Projets</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills" type="button" role="tab" aria-controls="skills" aria-selected="false">Compétences</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="false">Accueil</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Section Projets -->
+            <div class="tab-pane fade show active" id="projects" role="tabpanel" aria-labelledby="projects-tab">
+                <div class="section">
+                    <h2>Gestion des Projets</h2>
+                    
+                    <!-- Formulaire d'ajout de projet -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Ajouter/Modifier un Projet</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="projectForm" enctype="multipart/form-data">
+                                <input type="hidden" id="projectId">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Titre</label>
+                                    <input type="text" class="form-control" id="title" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" rows="3" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Catégorie</label>
+                                    <input type="text" class="form-control" id="category">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="projectImage" class="form-label">Image</label>
+                                    <input type="file" class="form-control" id="projectImage" accept="image/*">
+                                    <div id="currentProjectImage" class="mt-2 d-none">
+                                        <p>Image actuelle:</p>
+                                        <img src="" alt="Image actuelle" style="max-height: 100px;">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tags" class="form-label">Tags (séparés par des virgules)</label>
+                                    <input type="text" class="form-control" id="tags">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="demoLink" class="form-label">Lien de démo</label>
+                                    <input type="url" class="form-control" id="demoLink">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="codeLink" class="form-label">Lien du code</label>
+                                    <input type="url" class="form-control" id="codeLink">
+                                </div>
+                                <button type="submit" class="btn btn-primary" id="saveProject">Enregistrer</button>
+                                <button type="button" class="btn btn-secondary" id="resetProjectForm">Réinitialiser</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Liste des projets -->
+                    <h3>Liste des Projets</h3>
+                    <div class="row" id="projectsList">
+                        <!-- Les projets seront ajoutés ici dynamiquement -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Compétences -->
+            <div class="tab-pane fade" id="skills" role="tabpanel" aria-labelledby="skills-tab">
+                <div class="section">
+                    <h2>Gestion des Compétences</h2>
+                    
+                    <!-- Formulaire d'ajout de compétence -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Ajouter/Modifier une Compétence</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="skillForm" enctype="multipart/form-data">
+                                <input type="hidden" id="skillId">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Nom</label>
+                                    <input type="text" class="form-control" id="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="skillImage" class="form-label">Image</label>
+                                    <input type="file" class="form-control" id="skillImage" accept="image/*">
+                                    <div id="currentSkillImage" class="mt-2 d-none">
+                                        <p>Image actuelle:</p>
+                                        <img src="" alt="Image actuelle" style="max-height: 100px;">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="shadowClass" class="form-label">Classe d'ombre</label>
+                                    <input type="text" class="form-control" id="shadowClass" value="shadow-color-default">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="order" class="form-label">Ordre</label>
+                                    <input type="number" class="form-control" id="order" value="0">
+                                </div>
+                                <button type="submit" class="btn btn-success" id="saveSkill">Enregistrer</button>
+                                <button type="button" class="btn btn-secondary" id="resetSkillForm">Réinitialiser</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Liste des compétences -->
+                    <h3>Liste des Compétences</h3>
+                    <div id="skillsList" class="text-center">
+                        <!-- Les compétences seront ajoutées ici dynamiquement -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Accueil -->
+            <div class="tab-pane fade" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <div class="section">
+                    <h2>Données d'Accueil</h2>
+                    
+                    <!-- Formulaire de modification des données d'accueil -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Modifier les Données d'Accueil</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="homeForm">
+                                <input type="hidden" id="homeId">
+                                <div class="mb-3">
+                                    <label for="homeTitle" class="form-label">Titre</label>
+                                    <input type="text" class="form-control" id="homeTitle" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="homeTypedTexts" class="form-label">Textes défilants (séparés par des virgules)</label>
+                                    <input type="text" class="form-control" id="homeTypedTexts" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="homeDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" id="homeDescription" rows="3" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="homeCvLink" class="form-label">Lien du CV</label>
+                                    <input type="url" class="form-control" id="homeCvLink">
+                                </div>
+                                <button type="submit" class="btn btn-info text-white">Mettre à jour</button>
+                                <button type="button" class="btn btn-secondary" id="resetHomeForm">Réinitialiser</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Affichage des données d'accueil -->
+                    <h3>Aperçu des Données d'Accueil</h3>
+                    <div id="homeData" class="card">
+                        <!-- Les données d'accueil seront ajoutées ici dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone de réponse API -->
+        <div class="mt-4">
+            <h3>Réponse API</h3>
+            <pre id="response">Les réponses de l'API s'afficheront ici</pre>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuration de base
+        const API_URL = 'http://localhost:5000/api';
+        
+        // Fonction pour afficher les réponses de l'API
+        function showResponse(data) {
+            document.getElementById('response').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        }
+
+        // Fonction pour afficher les erreurs
+        function showError(error) {
+            console.error('Erreur:', error);
+            document.getElementById('response').textContent = `Erreur: ${error.message || error}`;
+        }
+
+        // ====== GESTION DES PROJETS ======
+        
+        // Charger tous les projets
+        async function loadProjects() {
+            try {
+                const response = await fetch(`${API_URL}/projects`);
+                const projects = await response.json();
+                showResponse(projects);
+                displayProjects(projects);
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Afficher les projets dans la liste
+        function displayProjects(projects) {
+            const projectsList = document.getElementById('projectsList');
+            projectsList.innerHTML = '';
+            
+            if (projects.length === 0) {
+                projectsList.innerHTML = '<div class="col-12"><p>Aucun projet trouvé</p></div>';
+                return;
+            }
+            
+            projects.forEach(project => {
+                const projectCard = document.createElement('div');
+                projectCard.className = 'col-md-4 mb-3';
+                projectCard.innerHTML = `
+                    <div class="card h-100">
+                        <img src="${project.imgUrl || 'https://via.placeholder.com/150?text=No+Image'}" class="card-img-top" alt="${project.title}">
+                        <div class="card-body">
+                            <h5 class="card-title">${project.title}</h5>
+                            <p class="card-text">${project.description.substring(0, 100)}${project.description.length > 100 ? '...' : ''}</p>
+                            <p class="card-text"><small class="text-muted">Tags: ${project.tags.join(', ') || 'Aucun'}</small></p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm btn-primary edit-project" data-id="${project._id}">Modifier</button>
+                            <button class="btn btn-sm btn-danger delete-project" data-id="${project._id}">Supprimer</button>
+                        </div>
+                    </div>
+                `;
+                projectsList.appendChild(projectCard);
+            });
+            
+            // Ajouter les écouteurs d'événements pour les boutons
+            document.querySelectorAll('.edit-project').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const projectId = e.target.getAttribute('data-id');
+                    editProject(projectId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-project').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const projectId = e.target.getAttribute('data-id');
+                    deleteProject(projectId);
+                });
+            });
+        }
+
+        // Ajouter ou mettre à jour un projet
+        async function saveProject(e) {
+            e.preventDefault();
+            
+            const projectId = document.getElementById('projectId').value;
+            const isEdit = projectId !== '';
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('tags', document.getElementById('tags').value);
+            formData.append('demoLink', document.getElementById('demoLink').value);
+            formData.append('codeLink', document.getElementById('codeLink').value);
+            
+            const imageInput = document.getElementById('projectImage');
+            if (imageInput.files.length > 0) {
+                formData.append('image', imageInput.files[0]);
+            }
+            
+            try {
+                const url = isEdit ? `${API_URL}/projects/${projectId}` : `${API_URL}/projects`;
+                const method = isEdit ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+                
+                const result = await response.json();
+                showResponse(result);
+                
+                if (response.ok) {
+                    resetProjectForm();
+                    loadProjects();
+                }
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Charger un projet pour édition
+        async function editProject(projectId) {
+            try {
+                const response = await fetch(`${API_URL}/projects`);
+                const projects = await response.json();
+                const project = projects.find(p => p._id === projectId);
+                
+                if (project) {
+                    document.getElementById('projectId').value = project._id;
+                    document.getElementById('title').value = project.title;
+                    document.getElementById('description').value = project.description;
+                    document.getElementById('category').value = project.category || '';
+                    document.getElementById('tags').value = project.tags.join(', ');
+                    document.getElementById('demoLink').value = project.demoLink || '';
+                    document.getElementById('codeLink').value = project.codeLink || '';
+                    
+                    // Afficher l'image actuelle si elle existe
+                    const currentImageDiv = document.getElementById('currentProjectImage');
+                    if (project.imgUrl) {
+                        currentImageDiv.querySelector('img').src = project.imgUrl;
+                        currentImageDiv.classList.remove('d-none');
+                    } else {
+                        currentImageDiv.classList.add('d-none');
+                    }
+                    
+                    document.getElementById('saveProject').textContent = 'Mettre à jour';
+                    showResponse(project);
+                }
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Supprimer un projet
+        async function deleteProject(projectId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/projects/${projectId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                showResponse(result);
+                
+                if (response.ok) {
+                    loadProjects();
+                }
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Réinitialiser le formulaire de projet
+        function resetProjectForm() {
+            document.getElementById('projectForm').reset();
+            document.getElementById('projectId').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('currentProjectImage').classList.add('d-none');
+            document.getElementById('saveProject').textContent = 'Enregistrer';
+        }
+
+        // ====== GESTION DES COMPÉTENCES ======
+        
+        // Charger toutes les compétences
+        async function loadSkills() {
+            try {
+                const response = await fetch(`${API_URL}/skills`);
+                const skills = await response.json();
+                showResponse(skills);
+                displaySkills(skills);
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Afficher les compétences dans la liste
+        function displaySkills(skills) {
+            const skillsList = document.getElementById('skillsList');
+            skillsList.innerHTML = '';
+            
+            if (skills.length === 0) {
+                skillsList.innerHTML = '<p>Aucune compétence trouvée</p>';
+                return;
+            }
+            
+            skills.forEach(skill => {
+                const skillCard = document.createElement('div');
+                skillCard.className = 'skill-card';
+                skillCard.innerHTML = `
+                    <div class="card" style="width: 120px;">
+                        <img src="${skill.img || 'https://via.placeholder.com/80?text=No+Image'}" class="skill-img mx-auto mt-2" alt="${skill.name}">
+                        <div class="card-body p-2">
+                            <h6 class="card-title">${skill.name}</h6>
+                            <p class="card-text"><small>Ordre: ${skill.order}</small></p>
+                            <button class="btn btn-sm btn-success edit-skill" data-id="${skill._id}">Modifier</button>
+                            <button class="btn btn-sm btn-danger mt-1 delete-skill" data-id="${skill._id}">Supprimer</button>
+                        </div>
+                    </div>
+                `;
+                skillsList.appendChild(skillCard);
+            });
+            
+            // Ajouter les écouteurs d'événements pour les boutons
+            document.querySelectorAll('.edit-skill').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const skillId = e.target.getAttribute('data-id');
+                    editSkill(skillId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-skill').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const skillId = e.target.getAttribute('data-id');
+                    deleteSkill(skillId);
+                });
+            });
+        }
+
+        // Ajouter ou mettre à jour une compétence
+        async function saveSkill(e) {
+            e.preventDefault();
+            
+            const skillId = document.getElementById('skillId').value;
+            const isEdit = skillId !== '';
+            
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('shadowClass', document.getElementById('shadowClass').value);
+            formData.append('order', document.getElementById('order').value);
+            
+            const imageInput = document.getElementById('skillImage');
+            if (imageInput.files.length > 0) {
+                formData.append('image', imageInput.files[0]);
+            } else if (!isEdit) {
+                showResponse('Une image est requise pour ajouter une compétence');
+                return;
+            }
+            
+            try {
+                const url = isEdit ? `${API_URL}/skills/${skillId}` : `${API_URL}/skills`;
+                const method = isEdit ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+                
+                const result = await response.json();
+                showResponse(result);
+                
+                if (response.ok) {
+                    resetSkillForm();
+                    loadSkills();
+                }
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Charger une compétence pour édition
+        async function editSkill(skillId) {
+            try {
+                const response = await fetch(`${API_URL}/skills`);
+                const skills = await response.json();
+                const skill = skills.find(s => s._id === skillId);
+                
+                if (skill) {
+                    document.getElementById('skillId').value = skill._id;
+                    document.getElementById('name').value = skill.name;
+                    document.getElementById('shadowClass').value = skill.shadowClass || 'shadow-color-default';
+                    document.getElementById('order').value = skill.order || 0;
+                    
+                    // Afficher l'image actuelle si elle existe
+                    const currentImageDiv = document.getElementById('currentSkillImage');
+                    if (skill.img) {
+                        currentImageDiv.querySelector('img').src = skill.img;
+                        currentImageDiv.classList.remove('d-none');
+                    } else {
+                        currentImageDiv.classList.add('d-none');
+                    }
+                    
+                    document.getElementById('saveSkill').textContent = 'Mettre à jour';
+                    showResponse(skill);
+                }
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Supprimer une compétence
+        async function deleteSkill(skillId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cette compétence ?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/skills/${skillId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                showResponse(result);
+                
+                if (response.ok) {
+                    loadSkills();
+                }
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Réinitialiser le formulaire de compétence
+        function resetSkillForm() {
+            document.getElementById('skillForm').reset();
+            document.getElementById('skillId').value = '';
+            document.getElementById('currentSkillImage').classList.add('d-none');
+            document.getElementById('saveSkill').textContent = 'Enregistrer';
+        }
+
+        // ====== GESTION DE L'ACCUEIL ======
+        
+        // Charger les données d'accueil
+        async function loadHomeData() {
+            try {
+                const response = await fetch(`${API_URL}/home`);
+                const homeData = await response.json();
+                showResponse(homeData);
+                
+                // Afficher les données d'accueil
+                const homeDataDiv = document.getElementById('homeData');
+                if (homeData && homeData.length > 0) {
+                    const data = homeData[0];
+                    homeDataDiv.innerHTML = `
+                        <div class="card-body">
+                            <h3>${data.title || 'Titre non défini'}</h3>
+                            <p><strong>Textes défilants:</strong> ${data.typedTexts || 'Textes défilants non définis'}</p>
+                            <p><strong>Description:</strong> ${data.description || 'Description non définie'}</p>
+                            <p><strong>Lien du CV:</strong> ${data.cvLink || 'Lien du CV non défini'}</p>
+                        </div>
+                    `;
+                } else {
+                    homeDataDiv.innerHTML = '<p>Aucune donnée d\'accueil trouvée</p>';
+                }
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Mettre à jour les données d'accueil
+        async function saveHomeData(e) {
+            e.preventDefault();
+            
+            const homeId = document.getElementById('homeId').value;
+            const isEdit = homeId !== '';
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('homeTitle').value);
+            formData.append('typedTexts', document.getElementById('homeTypedTexts').value);
+            formData.append('description', document.getElementById('homeDescription').value);
+            formData.append('cvLink', document.getElementById('homeCvLink').value);
+            
+            try {
+                const url = isEdit ? `${API_URL}/home/${homeId}` : `${API_URL}/home`;
+                const method = isEdit ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+                
+                const result = await response.json();
+                showResponse(result);
+                
+                if (response.ok) {
+                    resetHomeForm();
+                    loadHomeData();
+                }
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Charger les données d'accueil pour édition
+        async function editHomeData() {
+            try {
+                const response = await fetch(`${API_URL}/home`);
+                const homeData = await response.json();
+                const data = homeData[0];
+                
+                if (data) {
+                    document.getElementById('homeId').value = data._id;
+                    document.getElementById('homeTitle').value = data.title;
+                    document.getElementById('homeTypedTexts').value = data.typedTexts;
+                    document.getElementById('homeDescription').value = data.description;
+                    document.getElementById('homeCvLink').value = data.cvLink;
+                    
+                    showResponse(data);
+                }
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Réinitialiser le formulaire d'accueil
+        function resetHomeForm() {
+            document.getElementById('homeForm').reset();
+            document.getElementById('homeId').value = '';
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Charger les données initiales
+            loadProjects();
+            
+            // Ajouter les écouteurs d'événements pour les onglets
+            document.getElementById('skills-tab').addEventListener('click', loadSkills);
+            document.getElementById('home-tab').addEventListener('click', loadHomeData);
+            
+            // Formulaire de projet
+            document.getElementById('projectForm').addEventListener('submit', saveProject);
+            document.getElementById('resetProjectForm').addEventListener('click', resetProjectForm);
+            
+            // Formulaire de compétence
+            document.getElementById('skillForm').addEventListener('submit', saveSkill);
+            document.getElementById('resetSkillForm').addEventListener('click', resetSkillForm);
+            
+            // Formulaire d'accueil
+            document.getElementById('homeForm').addEventListener('submit', saveHomeData);
+            document.getElementById('resetHomeForm').addEventListener('click', resetHomeForm);
+        });
+    </script>
+</body>
+</html>
